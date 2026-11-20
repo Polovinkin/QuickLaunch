@@ -8,7 +8,7 @@
 #
 # Usage: store/review/record-disclosure.sh [--reset] [package]
 #   --reset   clear the app's data and disable the service first, so the setup row is shown again.
-#   package   defaults to com.ahmedgeek.quicklaunch.debug (the emulator build).
+#   package   defaults to com.polovinkin.quicklaunch.debug (the emulator build).
 # Output: store/review/part1.mp4 and part1.marks (label + second offset of each tap; assemble.py trims
 # the dead time between taps and adds captions).
 set -euo pipefail
@@ -16,8 +16,8 @@ cd "$(dirname "$0")"
 
 RESET=0
 [[ "${1:-}" == "--reset" ]] && { RESET=1; shift; }
-PKG="${1:-com.ahmedgeek.quicklaunch.debug}"
-SERVICE="$PKG/com.ahmedgeek.quicklaunch.shortcut.KeyboardShortcutService"
+PKG="${1:-com.polovinkin.quicklaunch.debug}"
+SERVICE="$PKG/com.polovinkin.quicklaunch.shortcut.KeyboardShortcutService"
 OUT=part1
 DEVICE_FILE=/sdcard/ql-review-$OUT.mp4
 

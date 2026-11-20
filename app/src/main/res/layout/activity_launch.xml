@@ -56,7 +56,7 @@
             android:paddingTop="6dp"
             android:paddingBottom="6dp">
 
-            <com.ahmedgeek.quicklaunch.ui.ResultsScroll
+            <com.polovinkin.quicklaunch.ui.ResultsScroll
                 android:id="@+id/results_scroll"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -65,12 +65,12 @@
                 android:scrollbarThumbVertical="@drawable/scroll_thumb"
                 android:scrollbarSize="3dp">
 
-                <com.ahmedgeek.quicklaunch.ui.ResultsView
+                <com.polovinkin.quicklaunch.ui.ResultsView
                     android:id="@+id/results"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical" />
-            </com.ahmedgeek.quicklaunch.ui.ResultsScroll>
+            </com.polovinkin.quicklaunch.ui.ResultsScroll>
 
             <TextView
                 android:id="@+id/empty"

@@ -12,9 +12,8 @@ repo can prepare is already done: signed AAB, listing text, graphics, privacy po
 | App or game | App |
 | Free or paid | Free (cannot be changed to paid later) |
 | Category | Productivity (recommended; Tools is the fallback). No ads, no in-app purchases. |
-| Contact email | me@ahmedgeek.com |
-| Privacy policy URL | https://ahmedthegeek.github.io/QuickLaunch/privacy-policy.html |
-| Package name | com.ahmedgeek.quicklaunch |
+| Privacy policy URL | https://polovinkin.github.io/QuickLaunch/privacy-policy.html |
+| Package name | com.polovinkin.quicklaunch |
 | Upload artifact | `release/QuickLaunch-v1.0.0-vc7.aab` (versionCode 7, versionName 1.0.0), signed with `keystore/upload-keystore.jks` |
 | Upload key SHA-256 | 64:06:EA:2A:DC:0B:B3:F4:46:E4:56:24:58:A7:F1:0E:E1:03:CB:0C:38:88:34:FB:92:3B:5A:A2:EA:19:48:C6 |
 | Store listing text | `store/listing/title.txt`, `short_description.txt`, `full_description.txt` (26 / 77 / 1920 chars, limits 30 / 80 / 4000) |

@@ -110,7 +110,7 @@ A baseline profile is bundled and installed on first run; Android compiles it du
 background dexopt (usually overnight while charging). To get the fast cold start immediately:
 
 ```
-adb shell cmd package compile -m speed-profile -f com.ahmedgeek.quicklaunch
+adb shell cmd package compile -m speed-profile -f com.polovinkin.quicklaunch
 ```
 
 ## Build

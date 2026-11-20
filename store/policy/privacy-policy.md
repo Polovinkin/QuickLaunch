@@ -2,7 +2,7 @@
 
 _Last updated: 12 September 2026_
 
-Quick Launch is an app launcher for Android developed by Ahmed Hussein ("we"). This policy explains what the app does with data. The short version: everything stays on your device, and nothing is transmitted anywhere.
+Quick Launch is an app launcher for Android improved by Polovinkin ("we"), originally developed by Ahmed Hussein. This policy explains what the app does with data. The short version: everything stays on your device, and nothing is transmitted anywhere.
 
 ## Data the app processes on your device
 
@@ -33,6 +33,6 @@ All data is stored in the app's private storage. Uninstalling Quick Launch, or c
 
 Quick Launch is a general-purpose utility, not directed at children, and collects no personal data from anyone.
 
-## Changes and contact
+## Changes
 
-If this policy changes, the updated version will be published at the same address with a new date. Questions: me@ahmedgeek.com
+If this policy changes, the updated version will be published at the same address with a new date.

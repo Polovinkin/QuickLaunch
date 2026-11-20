@@ -26,4 +26,4 @@ PERMISSIONS, PLAINLY
 • Usage access (optional): "most used" ordering. Read on your device, never sent anywhere.
 • Accessibility service (optional): only to hear Ctrl+Space. It reads no screen content.
 
-Everything stays on your device. Free and open source (GPL-3.0): github.com/AhmedTheGeek/QuickLaunch
+Everything stays on your device. Free and open source (GPL-3.0): github.com/Polovinkin/QuickLaunch

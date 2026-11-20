@@ -6,7 +6,7 @@
 
 A Spotlight-style app launcher for Android. Keyboard-first, instant, and out of your way.
 
-[**Download the APK**](https://github.com/AhmedTheGeek/QuickLaunch/releases/latest) · [How it works](docs/TECHNICAL.md) · GPL-3.0
+[**Download the APK**](https://github.com/Polovinkin/QuickLaunch/releases/latest) · [How it works](docs/TECHNICAL.md) · GPL-3.0
 
 <img src="docs/demo.gif" width="420" alt="On a Galaxy Z Fold: typing x finds X, typing spo finds Spotify, Enter opens it">
 
@@ -42,7 +42,7 @@ disappears the moment you launch something.
 
 ## Install
 
-1. Download the APK from the [latest release](https://github.com/AhmedTheGeek/QuickLaunch/releases/latest)
+1. Download the APK from the [latest release](https://github.com/Polovinkin/QuickLaunch/releases/latest)
    and open it on your phone. Allow installing from your browser when asked.
 2. Open Quick Launch once and tap the **⚡ row** to allow *Display over other apps*. That is what makes
    it instant.
@@ -69,7 +69,7 @@ Android 8.0 or newer. The blur behind the card needs Android 12 or newer.
 - Over Settings and some secure screens Android hides overlays, so the card appears with the normal
   app animation there instead of instantly.
 - No internet permission, no analytics, nothing leaves the device.
-  [Privacy policy](https://ahmedthegeek.github.io/QuickLaunch/privacy-policy.html).
+  [Privacy policy](https://polovinkin.github.io/QuickLaunch/privacy-policy.html).
 
 ## For the curious
 
