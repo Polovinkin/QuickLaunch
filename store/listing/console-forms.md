@@ -12,9 +12,8 @@ repo can prepare is already done: signed AAB, listing text, graphics, privacy po
 | App or game | App |
 | Free or paid | Free (cannot be changed to paid later) |
 | Category | Productivity (recommended; Tools is the fallback). No ads, no in-app purchases. |
-| Contact email | me@ahmedgeek.com |
-| Privacy policy URL | https://ahmedthegeek.github.io/QuickLaunch/privacy-policy.html |
-| Package name | com.ahmedgeek.quicklaunch |
+| Privacy policy URL | https://polovinkin.github.io/QuickLaunch/privacy-policy.html |
+| Package name | com.polovinkin.quicklaunch |
 | Upload artifact | `release/QuickLaunch-v1.0.0-vc7.aab` (versionCode 7, versionName 1.0.0), signed with `keystore/upload-keystore.jks` |
 | Upload key SHA-256 | 64:06:EA:2A:DC:0B:B3:F4:46:E4:56:24:58:A7:F1:0E:E1:03:CB:0C:38:88:34:FB:92:3B:5A:A2:EA:19:48:C6 |
 | Store listing text | `store/listing/title.txt`, `short_description.txt`, `full_description.txt` (26 / 77 / 1920 chars, limits 30 / 80 / 4000) |
@@ -48,32 +47,6 @@ Screenshots are rendered mockups (24-bit PNG, no alpha) built by `store/screensh
 - **Financial features**: None.
 - **Health**: No health features.
 - **Advertising ID**: Does not use advertising ID.
-- **Accessibility API usage** (the Console asks this because the app declares an AccessibilityService).
-  - Is the app an accessibility tool (helps users with disabilities)? **No.** The manifest sets
-    `isAccessibilityTool="false"`.
-  - Purpose / core functionality (paste this):
-    > Quick Launch is a keyboard-first launcher overlay, not a home screen replacement. The optional accessibility service exists only
-    > to detect the Ctrl+Space key combination on a physical keyboard so the launcher can be opened
-    > from any app, the same way desktop launchers work. It requests only
-    > flagRequestFilterKeyEvents, subscribes to no accessibility event types, cannot retrieve window
-    > content (canRetrieveWindowContent=false), and stores nothing. The user enables it explicitly in
-    > Settings; before that, the app shows an in-app disclosure that explains the purpose and states
-    > that no screen content or personal data is read, stored or shared, and the user must tap
-    > Continue. The service description shown by Android repeats it.
-  - Prominent disclosure and consent: tapping the "Open with Ctrl+Space" setup row opens
-    `ShortcutDisclosureActivity` (strings `disclosure_*`), which explains why the AccessibilityService
-    API is used, what it receives (only the Ctrl+Space key event) and that nothing is collected or
-    shared; "Continue" is the affirmative consent, "Not now" declines. The system service description
-    (`a11y_description`) and the privacy policy repeat it.
-  - **Video** (the Console requires a link because `isAccessibilityTool="false"`): see
-    `store/review/README.md`. `record-disclosure.sh` records the app opening, the setup row, the
-    disclosure, the decline path, the disclosure again, Continue, Settings and the switch being turned
-    on; part 2 (Ctrl+Space opening the launcher from another app) is recorded by hand; `assemble.py`
-    trims, captions and joins them into `store/review/accessibility-disclosure.mp4` (gitignored).
-    Upload it unlisted to YouTube or to Google Drive with "anyone with the link" and paste the link
-    in the declaration.
-  - If reviewers push back, the fallback is to remove the service and rely on the launcher-icon
-    trigger only; the feature is optional and the rest of the app does not depend on it.
 
 ## Permissions Play may ask about
 
@@ -101,8 +74,7 @@ Screenshots are rendered mockups (24-bit PNG, no alpha) built by `store/screensh
    request to Google.
 5. **Internal testing release**: Testing > Internal testing > Create release > upload
    `release/QuickLaunch-v0.1.1.aab`, paste the release notes, roll out. Add yourself as a tester and
-   install from the opt-in link to confirm the Play-signed build works (overlay, usage access,
-   Ctrl+Space).
+   install from the opt-in link to confirm the Play-signed build works (overlay, usage access).
 6. **Closed testing** (only if the account is new and personal): promote the internal release to a
    closed track, add 12+ testers, wait 14 days, then apply for production access.
 7. **Production**: promote the same release. First review usually takes 1 to 7 days.

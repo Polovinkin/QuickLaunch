@@ -15,11 +15,11 @@ val keystoreProps = Properties().apply {
 val hasUploadKey = keystoreProps.containsKey("storeFile")
 
 android {
-    namespace = "com.ahmedgeek.quicklaunch"
+    namespace = "com.polovinkin.quicklaunch"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.ahmedgeek.quicklaunch"
+        applicationId = "com.polovinkin.quicklaunch"
         minSdk = 26
         targetSdk = 36
         versionCode = 8

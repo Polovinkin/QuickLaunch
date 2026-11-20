@@ -6,7 +6,6 @@ WHY PEOPLE SWITCH
 • Any app is two letters away. Results update on every keystroke, ranked so the app you mean comes first.
 • It speaks your shorthand. Prefixes, word starts and initials all match: "yt" opens YouTube, "gm" opens Gmail.
 • It knows what you'll open next. The apps you use most rise to the top, and with Usage access they're listed before you type at all.
-• Never leave the keyboard. Enter opens, Up and Down move, Esc closes. Tab, Ctrl+N and Ctrl+P work too.
 • Summon it anywhere. Instant mode draws the card within a frame of the trigger, over any app.
 • Drag to split screen. Long-press a result and drop it beside the app you're in.
 • Work profile apps are included and badged.
@@ -16,14 +15,12 @@ FAST IS THE FEATURE
 • Tiny download, no background service, no network access.
 • No ads, no analytics, no accounts.
 
-MADE FOR PEOPLE WHO TYPE
-• Physical keyboards, Samsung DeX, foldables and tablets: the card is centred and sized for large screens.
-• Ctrl+Space opens Quick Launch from any app when a keyboard is attached.
-• Or bind it to the side key, a gesture, or Good Lock One Hand Operation+.
+MADE FOR YOUR PHONE
+• Full width on phones, centered and sized cleanly on foldables and tablets.
+• Bind it to the side key, a gesture, or Good Lock One Hand Operation+.
 
 PERMISSIONS, PLAINLY
 • Display over other apps (optional): instant mode.
 • Usage access (optional): "most used" ordering. Read on your device, never sent anywhere.
-• Accessibility service (optional): only to hear Ctrl+Space. It reads no screen content.
 
-Everything stays on your device. Free and open source (GPL-3.0): github.com/AhmedTheGeek/QuickLaunch
+Everything stays on your device. Free and open source (GPL-3.0): github.com/Polovinkin/QuickLaunch

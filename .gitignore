@@ -23,6 +23,3 @@
 
 # Kotlin daemon session files
 .kotlin/
-
-# Play review video (recorded by store/review/record-disclosure.sh)
-/store/review/*.mp4
