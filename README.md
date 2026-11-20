@@ -16,9 +16,7 @@ A Spotlight-style app launcher for Android. Instant, lightweight, and out of you
 
 ## Why
 
-Finding an app on Android means scrolling a grid or opening a search that still makes you tap the
-result. Quick Launch treats your phone like a computer: summon it, type two or three letters, press
-Enter. Done. Touch is optional.
+Finding an app on Android means scrolling a grid or opening a search that still makes you tap through folders. Quick Launch brings up an instant search bar: summon it, type two or three letters, and tap or press Enter. Done.
 
 It is not a home screen replacement. It is a small card that appears over whatever you are doing and
 disappears the moment you launch something.

@@ -137,10 +137,6 @@ def card(query, rows, footer=False, selected=0, badges=None):
     q = f'<span>{query}<span class="caret"></span></span>' if query else '<span class="hint">Search apps</span>'
     body = "".join(row(n, i == selected, badges.get(n)) for i, n in enumerate(rows))
     foot = ""
-    if footer:
-        foot = ('<div class="footer"><span class="key"><span class="ms">keyboard_return</span></span> open<span class="gap"></span>'
-                '<span class="key"><span class="ms">arrow_upward</span></span><span style="width:3px"></span><span class="key"><span class="ms">arrow_downward</span></span> navigate<span class="gap"></span>'
-                '<span class="key">esc</span> close</div>')
     return f'<div class="card"><div class="input"><span class="ms">search</span>{q}</div><div class="divider"></div><div class="body">{body}</div>{foot}</div>'
 
 def keyboard(word="", s1="", s2=""):
@@ -181,8 +177,8 @@ def ph_home(rows, footer=False):
 
 SCENES["phone/01_type.png"] = (1080, 2400, GP, headline(90, 170, 900, "Any app.<br>Two letters away.", "Stop digging through folders and pages.", 96, 40),
     device(**PH, screen_html=ph_home(3) + card("ca", ["Calendar", "Camera", "Calculator"]) + keyboard("ca", "calendar", "can")))
-SCENES["phone/02_keys.png"] = (1080, 2400, GP, headline(90, 170, 900, "Never leave<br>the keyboard.", "For people who type faster than they tap.", 96, 40),
-    device(**PH, screen_html=ph_home(3, True) + card("te", ["Telegram", "Teams", "Termux"], footer=True, selected=1)))
+SCENES["phone/02_keys.png"] = (1080, 2400, GP, headline(90, 170, 900, "Instant<br>from anywhere.", "One gesture away from every app on your phone.", 96, 40),
+    device(**PH, screen_html=ph_home(3, False) + card("te", ["Telegram", "Teams", "Termux"], footer=False, selected=0) + keyboard("te", "telegram", "teams")))
 SCENES["phone/03_most_used.png"] = (1080, 2400, GP, headline(90, 170, 900, "Knows what<br>you'll open next.", "Your favourites, ready before you type.", 96, 40),
     device(**PH, screen_html=ph_home(6) + card("", ["WhatsApp", "Chrome", "Spotify", "Gmail", "Maps", "YouTube"]) + keyboard()))
 notes = ('<div class="notes"><h2>Standup notes</h2><div class="meta">Edited 9:52 · 3 people</div>' + "".join(f'<div class="ln {c}"></div>' for c in ["", "m", "s", "", "xs", "m", "", "s", "m", "xs", "", "m", "s"]) + '</div>'
@@ -194,27 +190,23 @@ SCENES["phone/05_initials.png"] = (1080, 2400, GP, headline(90, 170, 900, "Speak
 
 T7 = dict(left=156, top=560, width=1500, height=1900, radius=72, dp_width=560, dp_height=740)
 SCENES["tablet7/01_fold.png"] = (1812, 2176, [(-300, 200, 1200, 1200, "#FFB020", 0.16), (1000, 1300, 1200, 1200, "#4C7DFF", 0.16)],
-    headline(156, 150, 1500, "At home on<br>the big screen.", "Foldables, tablets, DeX. Same speed, more room.", 110, 44),
-    device(**T7, screen_html=home(560, 740, 6, TAB_APPS[:6], TAB_DOCK, tablet=True, grid_top=card_bottom(3, True)+30, widget_top=card_bottom(3, True)+150) + card("ma", ["Maps", "Messages", "Meet"], footer=True)))
+    headline(156, 150, 1500, "At home on<br>the big screen.", "Foldables and tablets. Same speed, more room.", 110, 44),
+    device(**T7, screen_html=home(560, 740, 6, TAB_APPS[:6], TAB_DOCK, tablet=True, grid_top=card_bottom(3, False)+30, widget_top=card_bottom(3, False)+150) + card("ma", ["Maps", "Messages", "Meet"], footer=False)))
 
 T10L = dict(left=1040, top=190, width=1700, height=1200, radius=64, dp_width=720, dp_height=540)
-keycaps = ('<div style="position:absolute;left:150px;top:720px;display:flex;align-items:center;gap:26px;font-family:Manrope">'
-           '<span style="padding:26px 44px;border-radius:26px;background:linear-gradient(#3A3A42,#232328);box-shadow:0 10px 0 #15151A,0 22px 40px rgba(0,0,0,.6);font-weight:800;font-size:56px">Ctrl</span>'
-           '<span style="font-size:56px;color:#9A9AA3;font-weight:500">+</span>'
-           '<span style="padding:26px 120px;border-radius:26px;background:linear-gradient(#3A3A42,#232328);box-shadow:0 10px 0 #15151A,0 22px 40px rgba(0,0,0,.6);font-weight:800;font-size:56px">Space</span></div>')
 SCENES["tablet10/01_landscape.png"] = (2560, 1600, [(-300, -200, 1300, 1300, "#FFB020", 0.16), (1700, 800, 1300, 1300, "#4C7DFF", 0.16)],
-    headline(150, 260, 820, "One shortcut.<br>Every app.", "Ctrl+Space from anywhere, the way it works on your laptop.", 104, 42) + keycaps,
-    device(**T10L, screen_html=home(720, 540, 8, [], TAB_DOCK, tablet=True, grid_top=0, widget_top=card_bottom(1, True)+26) + card("sl", ["Slack"], footer=True)))
+    headline(150, 260, 820, "One gesture.<br>Every app.", "Instant search from anywhere, without leaving what you're doing.", 104, 42),
+    device(**T10L, screen_html=home(720, 540, 8, [], TAB_DOCK, tablet=True, grid_top=0, widget_top=card_bottom(1, False)+26) + card("sl", ["Slack"], footer=False)))
 
 T10P = dict(left=140, top=700, width=1320, height=2100, radius=72, dp_width=500, dp_height=800)
 SCENES["tablet10/02_portrait.png"] = (1600, 2560, [(-300, 300, 1200, 1200, "#FFB020", 0.16), (800, 1500, 1200, 1200, "#4C7DFF", 0.16)],
     headline(140, 170, 1320, "Fast enough<br>to feel instant.", "Results land as you type. No loading, no spinner, ever.", 104, 42),
-    device(**T10P, screen_html=home(500, 800, 6, TAB_APPS[:6], TAB_DOCK, tablet=True, grid_top=card_bottom(2, True)+30, widget_top=card_bottom(2, True)+150) + card("ph", ["Phone", "Photos"], footer=True)))
+    device(**T10P, screen_html=home(500, 800, 6, TAB_APPS[:6], TAB_DOCK, tablet=True, grid_top=card_bottom(2, False)+30, widget_top=card_bottom(2, False)+150) + card("ph", ["Phone", "Photos"], footer=False)))
 
 BOLT = '<svg viewBox="0 0 108 108"><path d="M59,26 L38,58 L52,58 L48,82 L70,48 L56,48 Z" fill="#F2F2F7"/></svg>'
 brand = (f'<div class="brand"><div class="mark"><span class="tile">{BOLT}</span><span class="name">Quick Launch</span></div>'
-         '<h1>Any app.<br>Two letters away.</h1><p>A keyboard-first launcher overlay for Android. Type, press Enter, done.</p></div>')
-stage = f'<div class="stage" style="zoom:1.05"><div class="pad"></div>{card("ca", ["Calendar", "Camera", "Calculator"], footer=True)}</div>'
+         '<h1>Any app.<br>Two letters away.</h1><p>An instant launcher overlay for Android. Type, press Enter, done.</p></div>')
+stage = f'<div class="stage" style="zoom:1.05"><div class="pad"></div>{card("ca", ["Calendar", "Camera", "Calculator"], footer=False)}</div>'
 SCENES["feature/feature_1024x500.png"] = (1024, 500, [(-150, -150, 700, 700, "#FFB020", 0.22), (600, 150, 700, 700, "#4C7DFF", 0.22)], brand, stage)
 
 for rel, (W, H, glows, head, dev) in SCENES.items():
