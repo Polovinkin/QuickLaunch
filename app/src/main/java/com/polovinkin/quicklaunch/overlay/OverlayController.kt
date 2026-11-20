@@ -54,6 +54,9 @@ class OverlayController(private val app: QuickLaunchApp) {
         if (existing != null) {
             if (existing.alpha == 0f) setPassThrough(false) // recover from an interrupted drag
             panel?.onShown()
+            if (existing.hasWindowFocus()) {
+                panel?.input?.let { KeyboardUtil.showImeInstantly(it) }
+            }
             onOutcome(true)
             return
         }
@@ -95,8 +98,15 @@ class OverlayController(private val app: QuickLaunchApp) {
         // never shown or focused. Focus is the only client-visible signal, and WM defers focus changes until the
         // pending transition ends, so the timeout has to be generous and counted from our first frame.
         var decided = false
+        var imeRequested = false
+        fun ensureImeShown() {
+            if (imeRequested || root !== newRoot || !newRoot.hasWindowFocus()) return
+            imeRequested = true
+            KeyboardUtil.showImeInstantly(newPanel.input)
+        }
         newRoot.onFocusGained = {
             newPanel.onWindowFocusGained() // clipboard becomes readable only now
+            ensureImeShown()
             if (!decided) {
                 decided = true
                 onOutcome(true)
@@ -129,14 +139,12 @@ class OverlayController(private val app: QuickLaunchApp) {
             }
         }
 
-        // Request the keyboard once our first frame is committed, skipping its slide-in animation.
+        // Request the keyboard once our first frame is committed and window has focus, skipping its slide-in animation.
         newRoot.viewTreeObserver.addOnPreDrawListener(object : android.view.ViewTreeObserver.OnPreDrawListener {
             override fun onPreDraw(): Boolean {
                 newRoot.viewTreeObserver.removeOnPreDrawListener(this)
                 newRoot.post {
-                    if (root === newRoot) {
-                        KeyboardUtil.showImeInstantly(newPanel.input)
-                    }
+                    ensureImeShown()
                 }
                 return true
             }

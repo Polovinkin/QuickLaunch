@@ -54,6 +54,8 @@ class LauncherPanel(
     }
 
     private var imeWasVisible = false
+    private var imeFallbackExpired = false
+    private var awaitingImeTimeoutScheduled = false
 
     private val index = app.index
     private val icons = app.icons
@@ -202,6 +204,9 @@ class LauncherPanel(
         active = true
         launched = false
         imeWasVisible = false
+        imeFallbackExpired = false
+        awaitingImeTimeoutScheduled = false
+        windowRoot.removeCallbacks(imeFallbackRunnable)
         link = null
         linkChecked = false
         index.listener = { onIndexChanged() }
@@ -210,6 +215,7 @@ class LauncherPanel(
         // Succeeds only if the window already has focus (a re-show); otherwise onWindowFocusGained retries.
         refreshLink()
         input.requestFocus()
+        if (windowRoot.isAttachedToWindow) ViewCompat.requestApplyInsets(windowRoot)
         // After the first frame is committed: revalidate the index and warm the icon cache.
         windowRoot.post {
             if (!active) return@post
@@ -222,6 +228,8 @@ class LauncherPanel(
         active = false
         rowMenu.hide()
         dragging = false
+        awaitingImeTimeoutScheduled = false
+        windowRoot.removeCallbacks(imeFallbackRunnable)
         windowRoot.removeCallbacks(dragWatchdog)
         index.listener = null
     }
@@ -286,6 +294,19 @@ class LauncherPanel(
 
     // ---- Insets --------------------------------------------------------------------------------
 
+    private val imeFallbackRunnable = Runnable {
+        awaitingImeTimeoutScheduled = false
+        if (!active || dragging || imeWasVisible) return@Runnable
+        imeFallbackExpired = true
+        if (card.alpha < 1f) card.alpha = 1f
+        ViewCompat.requestApplyInsets(windowRoot)
+    }
+
+    private fun imeCacheKey(): String {
+        val cfg = res.configuration
+        return "ime_h_${cfg.screenWidthDp}x${cfg.screenHeightDp}_${cfg.densityDpi}"
+    }
+
     private fun installInsetsHandling() {
         val topOffsetMin = res.getDimensionPixelSize(R.dimen.card_top_offset)
         val sideMargin = res.getDimensionPixelSize(R.dimen.card_margin_h)
@@ -311,8 +332,47 @@ class LauncherPanel(
 
             val screenWidth = if (v.width > 0) v.width else res.displayMetrics.widthPixels
             val screenHeight = if (v.height > 0) v.height else res.displayMetrics.heightPixels
-            val bottom = maxOf(bars.bottom, ime.bottom) + sideMargin
-            v.setPadding(bars.left, 0, bars.right, bottom)
+            val hardKeyboard = res.configuration.hardKeyboardHidden == android.content.res.Configuration.HARDKEYBOARDHIDDEN_NO
+            val imeKey = imeCacheKey()
+
+            val effectiveImeBottom: Int
+            if (imeVisible) {
+                windowRoot.removeCallbacks(imeFallbackRunnable)
+                awaitingImeTimeoutScheduled = false
+                imeFallbackExpired = false
+                if (prefs.getInt(imeKey, 0) != ime.bottom) {
+                    prefs.edit().putInt(imeKey, ime.bottom).apply()
+                }
+                if (card.alpha < 1f) card.alpha = 1f
+                effectiveImeBottom = ime.bottom
+            } else if (active && !dragging && !imeFallbackExpired && !hardKeyboard) {
+                val cachedIme = prefs.getInt(imeKey, 0)
+                if (cachedIme > 0) {
+                    effectiveImeBottom = cachedIme
+                    if (card.alpha < 1f) card.alpha = 1f
+                    if (!awaitingImeTimeoutScheduled) {
+                        awaitingImeTimeoutScheduled = true
+                        windowRoot.postDelayed(imeFallbackRunnable, 500L)
+                    }
+                } else {
+                    // First open in this screen configuration: keep the card transparent until real IME
+                    // insets arrive (or timeout expires) so it never flashes oversized before shrinking.
+                    effectiveImeBottom = (screenHeight * 0.42f).toInt()
+                    if (card.alpha > 0f) card.alpha = 0f
+                    if (!awaitingImeTimeoutScheduled) {
+                        awaitingImeTimeoutScheduled = true
+                        windowRoot.postDelayed(imeFallbackRunnable, 300L)
+                    }
+                }
+            } else {
+                effectiveImeBottom = 0
+                if (card.alpha < 1f) card.alpha = 1f
+            }
+
+            val bottom = maxOf(bars.bottom, effectiveImeBottom) + sideMargin
+            if (v.paddingLeft != bars.left || v.paddingRight != bars.right || v.paddingBottom != bottom) {
+                v.setPadding(bars.left, 0, bars.right, bottom)
+            }
 
             val availableWidth = screenWidth - bars.left - bars.right - sideMargin * 2
             val cardWidth = minOf(availableWidth, maxWidth)
@@ -458,6 +518,8 @@ class LauncherPanel(
         rowMenu.hide() // the finger slid on from the long press: the drag replaces the menu
         // Hiding the keyboard here must not be read as "user pressed Back" by the insets listener.
         imeWasVisible = false
+        awaitingImeTimeoutScheduled = false
+        windowRoot.removeCallbacks(imeFallbackRunnable)
         KeyboardUtil.hideIme(input)
         if (!AppDrag.start(row, entry)) {
             Log.w(QuickLaunchApp.TAG, "startDragAndDrop refused for ${entry.key}")
