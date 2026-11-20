@@ -22,22 +22,18 @@ How it works, why it is built the way it is, and how to build it. For the short 
   done at most once per clip (keyed by the clip timestamp) to keep the Android 12+ "pasted from your
   clipboard" toast to one per copy. Sensitive clips and clips the system has classified as URL-free
   are skipped from the description alone, without reading the content.
-- Enter launches the top or arrow-selected result. Up/Down (also Tab, Ctrl+N/P, Ctrl+J/K) move
-  the selection. Ctrl+1..9 launch that row directly. Esc, Back, tapping outside, Home or Recents close it.
+- Enter on the keyboard launches the top result. Back, tapping outside, Home or Recents close the card.
 - **Pins.** The highlighted row carries a 48dp pin button at its trailing edge (outline when the
-  app can be pinned, filled when it is pinned); Ctrl+D toggles the same row. On touch, type until
-  the app is the top row, then tap the pin. Pinned apps form their own "Pinned" section at the top
-  of the empty-query list, in the order they were pinned, with a hairline before the suggestions;
-  the section exists only while something is pinned. While typing there is one ranked list and a
-  pin is only a within-tier nudge (`Ranker.PIN_BOOST`), smaller than a heavily used app's frecency
-  boost, so match quality still decides. The order is a list of entry keys in `pins.bin`;
-  `PinStore.attach` writes each entry's position onto `AppEntry.pinOrder` after every load or
-  revalidation so ranking reads a field, never a map. The button is laid out on every row and only
-  its alpha and clickability change, so rows never relayout and taps on idle rows launch as usual.
-  The header and hairline are plain children of the results view, re-inserted at a new child index
-  only when the pinned boundary moves. The footer (physical keyboards only) shows Enter, Ctrl+D and
-  Esc keycaps; the Ctrl+D hint hides itself when the row would not fit, using the widths of the laid
-  out hints rather than re-measuring them.
+  app can be pinned, filled when it is pinned). Type until the app is the top row, then tap the pin.
+  Pinned apps form their own "Pinned" section at the top of the empty-query list, in the order they
+  were pinned, with a hairline before the suggestions; the section exists only while something is
+  pinned. While typing there is one ranked list and a pin is only a within-tier nudge
+  (`Ranker.PIN_BOOST`), smaller than a heavily used app's frecency boost, so match quality still
+  decides. The order is a list of entry keys in `pins.bin`; `PinStore.attach` writes each entry's
+  position onto `AppEntry.pinOrder` after every load or revalidation so ranking reads a field,
+  never a map. The button is laid out on every row and only its alpha and clickability change, so
+  rows never relayout and taps on idle rows launch as usual. The header and hairline are plain
+  children of the results view, re-inserted at a new child index only when the pinned boundary moves.
 - **Long-press a result** for a small menu with *App info* (the system screen, via
   `LauncherApps.startAppDetailsActivity`). The menu is drawn inside the panel's own window
   (`RowMenu`): a PopupWindow would take window focus, and the overlay reads focus loss as "dismiss".
@@ -63,32 +59,10 @@ Instant mode also falls back automatically over apps that hide non-system overla
 permission dialogs, some secure screens): if the overlay is not focused within ~0.9 s of drawing,
 it steps aside and the activity host opens instead.
 
-## Ctrl+Space from any app (physical keyboards)
-
-Enable **Quick Launch keyboard shortcut** under Settings → Accessibility → Installed apps. The card
-offers a ⌨ row that first shows a disclosure of what the service does and does not see (Play's
-prominent-disclosure rule for the AccessibilityService API); *Continue* takes you to Settings.
-Ctrl+Space then opens Quick Launch from anywhere, and a second Ctrl+Space closes it.
-
-**If the switch is greyed out with "Restricted setting":** Android 13+ blocks accessibility services
-for apps installed outside an app store until you allow it once. Open Settings → Apps → Quick Launch →
-⋮ (top right) → *Allow restricted settings*, then go back to Accessibility and enable it.
-
-Two more things to know:
-
-- Android normally uses Ctrl+Space to switch keyboard language. While the shortcut is on, Quick Launch
-  takes it instead.
-- This works through an accessibility service because that is the only hook that sees a key before the
-  system does. The service filters exactly one key combination, subscribes to no accessibility events,
-  and cannot read screen content (`canRetrieveWindowContent="false"`). Because it never starts an
-  activity, video apps do not drop into picture-in-picture when you open Quick Launch this way.
-
 ## Triggering it on Samsung
 
 - **Good Lock → One Hand Operation+**: pick a gesture → *Open app* → Quick Launch.
 - **Side key**: Settings → Advanced features → Side button → Double press → Open app → Quick Launch.
-- **Android 16 / One UI 8 keyboards**: Settings → General management → Physical keyboard →
-  Keyboard shortcuts → assign Meta + a key to Quick Launch.
 - Add Quick Launch to *Battery → Never sleeping apps* so One UI keeps the process warm.
 
 ## Performance (release build, API 36 emulator, instant mode)

@@ -1,7 +1,6 @@
 package com.polovinkin.quicklaunch.ui
 
 import android.content.Context
-import android.content.res.Configuration
 import android.os.Build
 import android.view.View
 import android.view.WindowInsets
@@ -10,10 +9,6 @@ import android.view.WindowInsetsAnimationController
 import android.view.inputmethod.InputMethodManager
 
 object KeyboardUtil {
-    /** True when a physical keyboard is attached and usable, so the IME should stay out of the way. */
-    fun hasHardwareKeyboard(config: Configuration): Boolean =
-        config.keyboard != Configuration.KEYBOARD_NOKEYS &&
-            config.hardKeyboardHidden == Configuration.HARDKEYBOARDHIDDEN_NO
 
     fun hideIme(view: View) {
         val imm = view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager ?: return

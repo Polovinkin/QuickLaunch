@@ -71,21 +71,11 @@ class LauncherPanel(
     private val footer: View = windowRoot.findViewById(R.id.footer)
     private val footerMessage: TextView = windowRoot.findViewById(R.id.hint_bar)
     private val footerAction: TextView = windowRoot.findViewById(R.id.footer_action)
-    private val footerKeys: ViewGroup = windowRoot.findViewById(R.id.footer_keys)
-    private val footerPin: View = windowRoot.findViewById(R.id.footer_pin)
-    /** Natural width of the pin hint, measured once while it is still GONE. */
-    private var footerPinWidth = 0
-    /** Width the other hints occupy when the pin hint is hidden; they always fit by design. */
-    private var footerOthersWidth = 0
     private var footerMessageSet = false
     private val setupHeader: View = windowRoot.findViewById(R.id.setup_header)
     private val usageHint = SetupRow(
         windowRoot.findViewById(R.id.usage_hint),
         R.drawable.ic_star, R.string.setup_usage_title, R.string.setup_usage_subtitle,
-    )
-    private val shortcutHint = SetupRow(
-        windowRoot.findViewById(R.id.shortcut_hint),
-        R.drawable.ic_keyboard, R.string.setup_shortcut_title, R.string.setup_shortcut_subtitle,
     )
     private val prefs = app.getSharedPreferences("ql", android.content.Context.MODE_PRIVATE)
 
@@ -155,76 +145,22 @@ class LauncherPanel(
             }
             host.dismiss()
         }
-        shortcutHint.onDismiss = {
-            prefs.edit().putBoolean(PREF_SHORTCUT_HINT_DISMISSED, true).apply()
-            updateUsageHint()
-        }
-        // Play policy: the accessibility disclosure is shown in-app and consented to before the Settings hand-off.
-        shortcutHint.onClick = {
-            try {
-                app.startActivity(
-                    android.content.Intent(app, com.polovinkin.quicklaunch.shortcut.ShortcutDisclosureActivity::class.java)
-                        .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK),
-                )
-            } catch (e: RuntimeException) {
-                Log.w(QuickLaunchApp.TAG, "disclosure activity start failed", e)
-            }
-            host.dismiss()
-        }
         installInsetsHandling()
-        footerKeys.addOnLayoutChangeListener { _, l, _, r, _, ol, _, or_, _ -> if (r - l != or_ - ol) fitFooterKeys() }
-    }
-
-    /**
-     * The Ctrl+D hint is optional: on phone-width cards the mandatory hints already fill the footer,
-     * so it appears only where the whole row fits (tablets, landscape, DeX, unfolded foldables).
-     * Widths are taken from real layouts, never from re-measuring laid-out children.
-     */
-    private fun fitFooterKeys() {
-        val available = footerKeys.width - footerKeys.paddingLeft - footerKeys.paddingRight
-        if (available <= 0) return
-        if (footerPinWidth == 0) {
-            val spec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
-            footerPin.measure(spec, spec)
-            footerPinWidth = footerPin.measuredWidth
-        }
-        if (footerPin.visibility == View.GONE) {
-            var used = 0
-            for (i in 0 until footerKeys.childCount) {
-                val c = footerKeys.getChildAt(i)
-                if (c.visibility == View.GONE) continue
-                val lp = c.layoutParams as ViewGroup.MarginLayoutParams
-                used += c.width + lp.leftMargin + lp.rightMargin
-            }
-            footerOthersWidth = used
-        }
-        val fits = footerOthersWidth + footerPinWidth <= available
-        val visibility = if (fits) View.VISIBLE else View.GONE
-        if (footerPin.visibility != visibility) footerPin.visibility = visibility
     }
 
     private fun updateUsageHint() {
         val show = query.isEmpty() && !prefs.getBoolean(PREF_USAGE_HINT_DISMISSED, false) && !index.usagePermitted()
         val visibility = if (show) View.VISIBLE else View.GONE
-        // Keyboard-first app: offer the Ctrl+Space setup until it is enabled or dismissed, keyboard attached or not.
-        val showShortcut = query.isEmpty() &&
-            !prefs.getBoolean(PREF_SHORTCUT_HINT_DISMISSED, false) &&
-            !com.polovinkin.quicklaunch.shortcut.KeyboardShortcutService.isEnabled(app)
-        val shortcutVisibility = if (showShortcut) View.VISIBLE else View.GONE
-        val headerVisibility = if (show || showShortcut) View.VISIBLE else View.GONE
-        if (usageHint.view.visibility != visibility || shortcutHint.view.visibility != shortcutVisibility) {
+        if (usageHint.view.visibility != visibility) {
             usageHint.view.visibility = visibility
-            shortcutHint.view.visibility = shortcutVisibility
-            setupHeader.visibility = headerVisibility
+            setupHeader.visibility = visibility
             ViewCompat.requestApplyInsets(windowRoot)
         }
     }
 
-    /** Footer keycap hints are only useful with a physical keyboard; the footer hides when it has nothing to say. */
+    /** The footer is shown only when the fallback activity offers instant mode. */
     private fun updateFooter() {
-        val keys = !footerMessageSet && KeyboardUtil.hasHardwareKeyboard(res.configuration)
-        footerKeys.visibility = if (keys) View.VISIBLE else View.GONE
-        val visibility = if (keys || footerMessageSet) View.VISIBLE else View.GONE
+        val visibility = if (footerMessageSet) View.VISIBLE else View.GONE
         if (footer.visibility != visibility) {
             footer.visibility = visibility
             ViewCompat.requestApplyInsets(windowRoot) // the row budget depends on it
@@ -358,13 +294,13 @@ class LauncherPanel(
         val headerHeight = res.getDimensionPixelSize(R.dimen.section_header_height)
         val separatorHeight = res.getDimensionPixelSize(R.dimen.section_separator_height)
         val fixedChrome = res.getDimensionPixelSize(R.dimen.input_height) + res.getDimensionPixelSize(R.dimen.card_padding) * 2
-        // The footer (keycaps with a physical keyboard, or the instant mode offer) only takes room when shown.
+        // The footer (the instant mode offer) only takes room when shown.
         val footerHeight = (rowHeight * 0.85f).toInt()
 
         ViewCompat.setOnApplyWindowInsetsListener(windowRoot) { v, insets ->
             val bars: Insets = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
             val ime: Insets = insets.getInsets(WindowInsetsCompat.Type.ime())
-            // Back with the keyboard up hides the keyboard first; treat that as "cancel" like Esc.
+            // Back with the keyboard up hides the keyboard first; treat that as "cancel".
             val imeVisible = ime.bottom > 0
             if (active && !dragging && imeWasVisible && !imeVisible) {
                 imeWasVisible = false
@@ -378,8 +314,6 @@ class LauncherPanel(
             val bottom = maxOf(bars.bottom, ime.bottom) + sideMargin
             v.setPadding(bars.left, 0, bars.right, bottom)
 
-            // Phones: full width minus margins. Tablets, foldables, DeX, landscape: a centered card
-            // capped at card_max_width, sitting a bit lower so it reads as a floating palette.
             val availableWidth = screenWidth - bars.left - bars.right - sideMargin * 2
             val cardWidth = minOf(availableWidth, maxWidth)
             val topMargin = bars.top + maxOf(topOffsetMin, (screenHeight * 0.08f).toInt())
@@ -391,7 +325,7 @@ class LauncherPanel(
                 card.layoutParams = lp
             }
 
-            val hintRows = (if (usageHint.view.visibility == View.VISIBLE) 1 else 0) + (if (shortcutHint.view.visibility == View.VISIBLE) 1 else 0)
+            val hintRows = if (usageHint.view.visibility == View.VISIBLE) 1 else 0
             val hintRow = hintRows * rowHeight + (if (hintRows > 0) headerHeight else 0)
             val pinnedSection = if (pinnedCount() > 0) headerHeight + separatorHeight else 0
             val footerSpace = if (footer.visibility == View.VISIBLE) footerHeight else 0
@@ -459,15 +393,6 @@ class LauncherPanel(
         Trace.endSection()
     }
 
-    private fun moveSelection(delta: Int) {
-        val rows = rowCount()
-        if (rows == 0) return
-        val next = (selected + delta).coerceIn(0, minOf(rows, resultsView.maxVisible) - 1)
-        if (next == selected) return
-        selected = next
-        resultsView.setSelected(selected)
-    }
-
     // ---- Pins ----------------------------------------------------------------------------------
 
     /** The app entry at a combined-list row index, or null for the link row / out of range. */
@@ -476,14 +401,11 @@ class LauncherPanel(
         return results.getOrNull(row - offset)
     }
 
-    /**
-     * Pin or unpin and re-rank so the row moves where it now belongs, keeping the selection on it.
-     * [feedback] is the tapped button for touch; null from the keyboard.
-     */
-    private fun togglePin(entry: AppEntry, feedback: View?) {
+    /** Pin or unpin and re-rank so the row moves where it now belongs, keeping the selection on it. */
+    private fun togglePin(entry: AppEntry, feedback: View) {
         if (launched) return
         val pinned = index.togglePin(entry)
-        feedback?.performHapticFeedback(
+        feedback.performHapticFeedback(
             if (pinned) HapticFeedbackConstants.CONTEXT_CLICK else HapticFeedbackConstants.CLOCK_TICK,
         )
         if (Log.isLoggable(QuickLaunchApp.TAG, Log.DEBUG)) Log.d(QuickLaunchApp.TAG, "pin ${entry.key} -> $pinned")
@@ -496,41 +418,12 @@ class LauncherPanel(
     fun handleKey(event: KeyEvent): Boolean {
         val down = event.action == KeyEvent.ACTION_DOWN
         when (event.keyCode) {
-            KeyEvent.KEYCODE_ENTER, KeyEvent.KEYCODE_NUMPAD_ENTER, KeyEvent.KEYCODE_DPAD_CENTER -> {
+            KeyEvent.KEYCODE_ENTER -> {
                 if (down && event.repeatCount == 0) launchSelected()
                 return true
             }
-            KeyEvent.KEYCODE_DPAD_DOWN -> {
-                if (down) moveSelection(+1)
-                return true
-            }
-            KeyEvent.KEYCODE_DPAD_UP -> {
-                if (down) moveSelection(-1)
-                return true
-            }
-            KeyEvent.KEYCODE_TAB -> {
-                if (down) moveSelection(if (event.isShiftPressed) -1 else +1)
-                return true
-            }
-            KeyEvent.KEYCODE_ESCAPE, KeyEvent.KEYCODE_BACK -> {
+            KeyEvent.KEYCODE_BACK -> {
                 if (down) if (rowMenu.isShowing) rowMenu.hide() else host.dismiss()
-                return true
-            }
-            KeyEvent.KEYCODE_N, KeyEvent.KEYCODE_J -> if (event.isCtrlPressed) {
-                if (down) moveSelection(+1)
-                return true
-            }
-            KeyEvent.KEYCODE_P, KeyEvent.KEYCODE_K -> if (event.isCtrlPressed) {
-                if (down) moveSelection(-1)
-                return true
-            }
-            KeyEvent.KEYCODE_D -> if (event.isCtrlPressed) {
-                if (down && event.repeatCount == 0) entryAt(selected)?.let { togglePin(it, null) }
-                return true
-            }
-            in KeyEvent.KEYCODE_1..KeyEvent.KEYCODE_9 -> if (event.isCtrlPressed) {
-                // Direct launch of row N. Pins keep the top rows stable, so this is a one-chord launch.
-                if (down && event.repeatCount == 0) launchRow(event.keyCode - KeyEvent.KEYCODE_1)
                 return true
             }
         }
@@ -554,9 +447,8 @@ class LauncherPanel(
     // ---- Drag to split screen ------------------------------------------------------------------
 
     private companion object {
-        // Stored under the old "tapped" names so users who acted on the previous hints are not asked again.
+        // Stored under the old "tapped" name so users who acted on the previous hint are not asked again.
         const val PREF_USAGE_HINT_DISMISSED = "usage_hint_tapped"
-        const val PREF_SHORTCUT_HINT_DISMISSED = "shortcut_hint_tapped"
     }
 
     private val dragWatchdog = Runnable { endDrag(dropped = false) }

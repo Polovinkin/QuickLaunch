@@ -33,8 +33,6 @@ class OverlayController(private val app: QuickLaunchApp) {
     private var panel: LauncherPanel? = null
     private var blurListener: Consumer<Boolean>? = null
 
-    val isShowing: Boolean get() = root != null
-
     /** The system sends this on Home, Recents and similar; an overlay window gets no focus loss for those. */
     private val closeReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -136,7 +134,7 @@ class OverlayController(private val app: QuickLaunchApp) {
             override fun onPreDraw(): Boolean {
                 newRoot.viewTreeObserver.removeOnPreDrawListener(this)
                 newRoot.post {
-                    if (root === newRoot && !KeyboardUtil.hasHardwareKeyboard(app.resources.configuration)) {
+                    if (root === newRoot) {
                         KeyboardUtil.showImeInstantly(newPanel.input)
                     }
                 }

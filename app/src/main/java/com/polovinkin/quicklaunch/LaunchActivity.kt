@@ -83,9 +83,7 @@ class LaunchActivity : Activity(), LauncherPanel.Host {
         if (hasFocus) panel.onWindowFocusGained()
         if (hasFocus && !imeShownOnce) {
             imeShownOnce = true
-            if (!KeyboardUtil.hasHardwareKeyboard(resources.configuration)) {
-                KeyboardUtil.showImeInstantly(panel.input)
-            }
+            KeyboardUtil.showImeInstantly(panel.input)
         }
     }
 
